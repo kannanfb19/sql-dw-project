@@ -67,4 +67,20 @@ SELECT
 FROM   BRONZE.CRM_PROD_INFO;
 
 
+----------------------
+INSERT INTO SILVER.ERP_LOC_AZ12(
+
+        CID, BDATE,GEN
+)
+
+SELECT    
+          REPLACE(CID,'NAS','') AS CID
+         ,CASE WHEN BDATE>CURRENT_DATE THEN NULL  ELSE BDATE END AS BDATE
+         ,CASE WHEN TRIM(GEN)='M' THEN 'Male'
+               WHEN TRIM(GEN)='F' THEN 'Female'
+               WHEN TRIM(GEN)='' THEN 'NA'
+               ELSE GEN END AS GEN 
+FROM DW.BRONZE.ERP_LOC_AZ12;
+
+
   
