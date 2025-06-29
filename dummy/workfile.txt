@@ -83,4 +83,38 @@ SELECT
 FROM DW.BRONZE.ERP_LOC_AZ12;
 
 
+------------------
+
+INSERT INTO SILVER.CRM_PROD_INFO(
+
+    PRD_ID
+   ,CAT_ID
+   ,PRD_KEY
+   ,PRD_NM
+   ,PRD_COST
+   ,PRD_LINE
+   ,PRD_START_DT
+   ,PRD_END_DT
+   ,DWH_CREATE_DATE)
+
+SELECT
+
+    PRD_ID
+   ,REPLACE(SUBSTR(PRD_KEY,1,5),'-','_') AS CAT_ID
+   ,SUBSTR(PRD_KEY,7,LEN(PRD_KEY)) AS PRD_KEY
+   ,PRD_NM
+   ,PRD_COST
+   --,PRD_LINE
+   ,CASE UPPER(TRIM(prd_line))
+        WHEN 'M' then 'MOUNTAIN'
+        WHEN 'R' then 'ROAD'
+        WHEN 'S' then 'Other Sales'
+        WHEN 'R' then 'Touring'
+        ELSE 'n/a' end as PRD_LINE
+         
+   ,PRD_START_DT :: DATE
+   ,(LEAD(PRD_START_DT) OVER (PARTITION BY PRD_KEY ORDER BY PRD_START_DT) - INTERVAL '1 day') :: DATE AS PRD_END_DT
+   ,CURRENT_DATE
+FROM   BRONZE.CRM_PROD_INFO;
+
   
